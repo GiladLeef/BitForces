@@ -6,3 +6,8 @@ We use Passware, not Hashcat. sharing the profits equally.
 
 * BitForces Telegram group - https://t.me/BitForcers
 ![kit-agent-screenshot](https://user-images.githubusercontent.com/96906027/208676909-501f7b91-c3c7-47b2-b7ea-28ffc58a9e0b.png)
+
+# How to get started?
+* You need to have an OpenCL GPU Device (Aka Nvidia/AMD GPUs)
+* Download Passware Kit Agent from https://www.passware.com/kit-agent/
+* Join our Telegram group to connect!

@@ -1,6 +1,6 @@
 # BitForces - Wallet.dat Team-work Cracking
 This is a distributed team-work project for cracking lost passwords wallet.dat files.
-We use Passware, not Hashcat. sharing the profits equally.
+We use Passware. Sharing the profits equally.
 
 * If anyone got good wallets, DM me at https://t.me/GiladLeef
 

@@ -55,7 +55,7 @@ CREATE TABLE `AgentBinary` (
 ) ENGINE = InnoDB;
 
 INSERT INTO `AgentBinary` (`agentBinaryId`, `type`, `version`, `operatingSystems`, `filename`, `updateTrack`, `updateAvailable`) VALUES
-  (1, 'python', '1.0.0', 'Windows, Linux, OS X', 'BitForces.exe', 'stable', '');
+  (1, 'python', '1.0.0', 'Windows, Linux, OS X', 'BitForces.zip', 'stable', '');
 
 CREATE TABLE `AgentError` (
   `agentErrorId` INT(11) NOT NULL,

@@ -7,5 +7,5 @@ We use Hashcat over the network. Sharing the profits equally.
 * BitForces Telegram group - https://t.me/BitForcers
 
 # How to get started?
-* You need to have an GPU Device
+* You need to have a GPU Device
 * Join our Telegram group to connect!

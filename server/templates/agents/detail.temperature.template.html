@@ -1,0 +1,138 @@
+<hr>
+<h3>Device(s) Temperature</h3>
+{{IF [[deviceTempAvailable]] > 0}}
+    <div class="row">
+        <div class="col col-12">
+            <canvas id="deviceTemp"></canvas>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var configTemp = {
+            type: 'line',
+            data: {
+                labels: [[deviceTempXLabels]],
+                datasets: [[deviceTemp]]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                tooltips: {
+                    mode: 'index',
+                    intersect: false
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Time'
+                        }
+                    }],
+                    yAxes: [[deviceTempAxes]]
+                }
+            }
+        };
+        $( document ).ready(function() {
+            new Chart(document.getElementById('deviceTemp').getContext('2d'), configTemp);
+        });
+    </script>
+{{ELSE}}
+    <i>Device(s) temperature data unavailable</i>
+{{ENDIF}}
+
+<hr>
+<h3>Device(s) utilisation</h3>
+{{IF [[deviceUtilAvailable]] > 0}}
+    <div class="row">
+        <div class="col col-12">
+            <canvas id="deviceUtil"></canvas>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var configUtil = {
+            type: 'line',
+            data: {
+                labels: [[deviceUtilXLabels]],
+                datasets: [[deviceUtil]]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                tooltips: {
+                    mode: 'index',
+                    intersect: false
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Time'
+                        }
+                    }],
+                    yAxes: [[deviceUtilAxes]]
+                }
+            }
+        };
+        $( document ).ready(function() {
+            new Chart(document.getElementById('deviceUtil').getContext('2d'), configUtil);
+        });
+    </script>
+{{ELSE}}
+    <i>GPU utilisation data unavailable</i>
+{{ENDIF}}
+
+<hr>
+<h3>Agent average CPU utilisation</h3>
+{{IF [[cpuUtilAvailable]] > 0}}
+    <div class="row">
+        <div class="col col-12">
+            <canvas id="cpuUtil"></canvas>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var configCpuUtil = {
+            type: 'line',
+            data: {
+                labels: [[cpuUtilXLabels]],
+                datasets: [[cpuUtil]]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                tooltips: {
+                    mode: 'index',
+                    intersect: false
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Time'
+                        }
+                    }],
+                    yAxes: [[cpuUtilAxes]]
+                }
+            }
+        };
+        $( document ).ready(function() {
+            new Chart(document.getElementById('cpuUtil').getContext('2d'), configCpuUtil);
+        });
+    </script>
+{{ELSE}}
+    <i>CPU utilisation data unavailable</i>
+{{ENDIF}}
+<hr>

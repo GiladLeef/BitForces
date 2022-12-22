@@ -1,0 +1,37 @@
+{{IF [[accessControl.hasPermission([[$DAccessControl::RUN_TASK_ACCESS]])]]}}
+  <h3>Create pre-configured tasks:</h3>
+  <form id="preconf" action="hashlists.php?id=[[list.getVal('hashlist')->getId()]]" method="POST">
+    <input type='hidden' name='action' value='[[$DHashlistAction::APPLY_PRECONFIGURED_TASKS]]'>
+    <input type="hidden" name="hashlist" value="[[list.getVal('hashlist')->getId()]]">
+    <input type="hidden" name="csrf" value="[[csrf]]">
+    <div class="panel panel-default">
+      <table class="table table-bordered table-nonfluid">
+        <tr>
+          <th>ID</th>
+          <th>Color</th>
+          <th>Name</th>
+        </tr>
+        {{FOREACH task;[[preTasks]]}}
+          <tr>
+            <td>
+              <a href="tasks.php?id=[[task.getId()]]">[[task.getId()]]</a>
+            </td>
+            <td{{IF [[strlen([[task.getColor()]])]] > 0}} style="background-color: #[[task.getColor()]]""{{ENDIF}}>
+              &nbsp;
+            </td>
+            <td>
+              <input type="checkbox" name="task[]" value="[[task.getId()]]" title="Task Selection">
+              <a href="pretasks.php?id=[[task.getId()]]" title="[[htmlentities([[task.getAttackCmd()]], ENT_QUOTES, "UTF-8")]]">[[task.getTaskName()]]</a>
+            </td>
+          </tr>
+        {{ENDFOREACH}}
+        <tr>
+          <td colspan="3">
+            <input type="submit" class='btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}}' value="Create">
+            <input type="checkbox" onChange="checkAll('preconf', this.checked);" title="Check All"> Select All
+          </td>
+        </tr>
+      </table>
+    </div>
+  </form>
+{{ENDIF}}

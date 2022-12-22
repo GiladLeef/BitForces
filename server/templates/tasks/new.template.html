@@ -1,0 +1,392 @@
+{%TEMPLATE->struct/head%}
+{%TEMPLATE->struct/menu%}
+<h2>New task</h2>
+{%TEMPLATE->struct/messages%}
+<form class='form-inline' action="tasks.php{{IF [[orig]] > 0 && [[origType]] == 2}}?new=true&copyPre=[[orig]]{{ENDIF}}" method="POST" enctype="multipart/form-data">
+  <div class="row" style="width: 110%">
+    <div class='col-md-8'>
+      <input type='hidden' name='action' value='[[$DTaskAction::CREATE_TASK]]'>
+      {{IF [[orig]] > 0 && [[origType]] == 2}}
+        <input type="hidden" name="copy" value="[[orig]]">
+      {{ENDIF}}
+      <input type="hidden" name="csrf" value="[[csrf]]">
+      <div class="panel panel-default">
+        <table class="table table-bordered table-nonfluid">
+          <tr>
+            <th>Property</th>
+            <th>Value</th>
+          </tr>
+          <tr>
+            <td>Name:</td>
+            <td>
+              <input type="text" class='form-control full-width' name="name" value="[[copy.getTaskName()]]">
+            </td>
+          </tr>
+          <tr>
+            <td>Hashlist:</td>
+            <td>
+              <select class='form-control full-width' name="hashlist">
+                {{FOREACH list;[[lists]]}}
+                <option value="[[list.getVal('id')]]" {{IF [[list.getVal('id')]] == [[hashlistId]]}} selected{{ENDIF}}>[[list.getVal('name')]]</option>
+                {{ENDFOREACH}}
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Command line:</td>
+            <td>
+              <textarea name="cmdline" class='form-control my-1 full-width' id="cmdLine" title="Cmd Line" {{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} readonly{{ENDIF}}>[[copy.getAttackCmd()]]</textarea>
+              Use <b>[[config.getVal('hashlistAlias')]]</b> for hash list and assume all files in current directory.<br>
+              If you have Linux agents, please mind the filename case sensitivity!
+            </td>
+          </tr>
+          <tr>
+            <td>Priority:</td>
+            <td>
+              <input type="number" class='form-control' name="priority" value="[[copy.getPriority()]]" title="Priority">
+            </td>
+          </tr>
+        </tr>
+        <tr>
+          <td>Maximum number of agents:</td>
+          <td>
+            <input type="number" class='form-control' name="maxAgents" value="[[copy.getMaxAgents()]]" title="Max Agents">
+          </td>
+        </tr>
+          <tr>
+            <td>Task notes:</td>
+            <td>
+              <textarea class="form-control my-1" style="width: 100%" name="notes" title="Task Notes" placeholder="Write task notes here..." {{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} readonly{{ENDIF}}>[[copy.getNotes()]]</textarea>
+            </td>
+          </tr>
+          <tr>
+            <td>Color:</td>
+            <td>
+              #<input type="text" class='form-control color {required:false}' name="color" size="6" value="[[copy.getColor()]]" title="Color" {{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} readonly{{ENDIF}}>
+            </td>
+          </tr>
+          <tr>
+            <td>Chunk size:</td>
+            <td>
+              <input type="number" class='form-control' name="chunk" value="[[copy.getChunkTime()]]" title="Chunk Time" {{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} readonly{{ENDIF}}>
+              seconds
+            </td>
+          </tr>
+          <tr>
+            <td>Status timer:</td>
+            <td>
+              <input type="number" class='form-control' name="status" value="[[copy.getStatusTimer()]]" title="Status Timer" {{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} readonly{{ENDIF}}>
+              seconds
+            </td>
+          </tr>
+          <tr>
+            <td>Benchmark Type (Hashcat only): </td>
+            <td>
+              <select name="benchType" class="form-control" title="Benchmark Type" {{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} readonly{{ENDIF}}>
+                <option value="0" {{IF [[copy.getUseNewBench()]] == 0}} selected{{ENDIF}}>Runtime Benchmark</option>
+                <option value="1" {{IF [[copy.getUseNewBench()]] == 1}} selected{{ENDIF}}>Speed Test</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Task is CPU only (gets only CPU agents assigned):</td>
+            <td>
+              <select name="cpuOnly" class="form-control" title="CPU only" {{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} readonly{{ENDIF}}>
+                <option value="0" {{IF [[copy.getIsCpuTask()]] == 0}} selected{{ENDIF}}>No</option>
+                <option value="1" {{IF [[copy.getIsCpuTask()]] == 1}} selected{{ENDIF}}>Yes</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Task is small (only one agent gets assigned to it):</td>
+            <td>
+              <select name="isSmall" class="form-control" title="Is small" {{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} readonly{{ENDIF}}>
+                <option value="0" {{IF [[copy.getIsSmall()]] == 0}} selected{{ENDIF}}>No</option>
+                <option value="1" {{IF [[copy.getIsSmall()]] == 1}} selected{{ENDIF}}>Yes</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Binary type to run task:</td>
+            <td>
+              <select name="crackerBinaryTypeId" id="crackerBinaryType" class="form-control" title="Cracker Binary">
+                {{FOREACH binary;[[binaries]]}}
+                  <option value="[[binary.getId()]]" {{IF [[binary.getId()]] == [[copy.getCrackerBinaryTypeId()]]}} selected{{ENDIF}}>[[binary.getTypeName()]]</option>
+                {{ENDFOREACH}}
+              </select>
+              <select name="crackerBinaryVersionId" id="crackerBinaryVersion" class="form-control" title="Binary Version">
+                <option value="0">&nbsp;</option>
+              </select>
+              <script type="text/javascript">
+                  var versions = [];
+                  {{FOREACH version;[[versions]]}}
+                    if ([[version.getCrackerBinaryTypeId()]] in versions) {
+                        versions[ [[version.getCrackerBinaryTypeId()]] ].push(["[[version.getVersion()]]", [[version.getId()]] ]);
+                    }
+                    else{
+                      versions [ [[version.getCrackerBinaryTypeId()]] ] = [ ["[[version.getVersion()]]", [[version.getId()]] ] ];
+                    }
+                  {{ENDFOREACH}}
+
+                  configureDropDownLists(document.getElementById('crackerBinaryType'), document.getElementById('crackerBinaryVersion'));
+                  $("#crackerBinaryType").change(function() {
+                      configureDropDownLists(document.getElementById('crackerBinaryType'), document.getElementById('crackerBinaryVersion'));
+                  });
+
+                  function configureDropDownLists(ddl1, ddl2) {
+                    ddl2.options.length = 0;
+                    if (ddl1.value.length === 0) {
+                        return;
+                    }
+                    for (i = 0; i < versions[ddl1.value].length; i++){
+                        createOption(ddl2, versions[ddl1.value][i][0], versions[ddl1.value][i][1]);
+                    }
+                  }
+
+                  function createOption(ddl, text, value) {
+                    var opt = document.createElement('option');
+                    if (value === [[copy.getCrackerBinaryId()]]) {
+                        opt.selected = true
+                    }
+                    opt.value = value;
+                    opt.text = text;
+                    ddl.options.add(opt);
+                  }
+              </script>
+            </td>
+          </tr>
+          <tr>
+            <th colspan="2" class="text-center">
+              Advanced Section
+              {{IF [[config.getVal([[$DConfig::HASHCAT_BRAIN_ENABLE]])]]}}
+                <br><span style="font-weight: normal;">Note: If hashcat brain is activated for the hashlist, prince and piped tasks would not be checked against it!</span>
+              {{ENDIF}}
+            </th>
+          </tr>
+          <tr>
+            <td>Set as preprocessor task:</td>
+            <td>
+              <select name="usePreprocessor" class="form-control full-width" title="Preprocessor" {{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} readonly{{ENDIF}}>
+                <option value="0" {{IF [[copy.getUsePreprocessor()]] == 0}} selected{{ENDIF}}>No</option>
+                {{FOREACH preprocessor;[[preprocessors]]}}
+                  <option value="[[preprocessor.getId()]]" {{IF [[copy.getUsePreprocessor()]] == [[preprocessor.getId()]]}} selected{{ENDIF}}>[[htmlentities([[preprocessor.getName()]], ENT_QUOTES, "UTF-8")]]</option>
+                {{ENDFOREACH}}
+              </select><br><br>
+              <input type="text" name="preprocessorCommand" id="preprocessorLine" placeholder="Command arguments without binary name and range settings" value="[[copy.getPreprocessorCommand()]]" class="form-control full-width" title="Preprocessor Command" {{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} readonly{{ENDIF}}>
+            </td>
+          </tr>
+          <tr>
+            <td>Skip a given keyspace at the beginning of the task:</td>
+            <td>
+              <input type="number" name="skipKeyspace" class="form-control" value="[[copy.getSkipKeyspace()]]" title="Skip Keyspace" {{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} readonly{{ENDIF}}>
+            </td>
+          </tr>
+          <tr>
+            <td>Use static chunking:</td>
+            <td>
+              <select name="staticChunking" class="form-control mx-1" {{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} readonly{{ENDIF}}>
+                <option value="0" {{IF [[copy.getStaticChunks()]] == 0}} selected{{ENDIF}}>No</option>
+                <option value="1" {{IF [[copy.getStaticChunks()]] == 1}} selected{{ENDIF}}>Fixed chunk size</option>
+                <option value="2" {{IF [[copy.getStaticChunks()]] == 2}} selected{{ENDIF}}>Fixed number of chunks</option>
+              </select>
+              <input type="number" class="form-control mx-1" name="chunkSize" title="Chunk Size / Number of Chunks" value="[[copy.getChunkSize()]]" {{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} readonly{{ENDIF}}>
+            </td>
+          </tr>
+          <tr>
+            <td>Enforce piping task (to apply rules before reject):</td>
+            <td>
+              <select name="enforcePipe" class="form-control mx-1" {{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} readonly{{ENDIF}}>
+                <option value="0" {{IF [[copy.getForcePipe()]] == 0}} selected{{ENDIF}}>No</option>
+                <option value="1" {{IF [[copy.getForcePipe()]] == 1}} selected{{ENDIF}}>Yes</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <input type="submit" class='btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}}' value="Create task">
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class='col-md-4'>
+      <div class='btn-toolbar my-1'>
+        <div class='btn-group'>
+          <button id="ruleButton" class='btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}}' onclick="return toggleFiles('rules')">Rules</button>
+          <button id="wordlistButton" class='btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}} active' onclick="return toggleFiles('wordlists')">Wordlists</button>
+          <button id="otherButton" class='btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}}' onclick="return toggleFiles('other')">Other</button>
+        </div>
+      </div>
+      <div id="rules">
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <tr>
+                <th>Filename</th>
+                <th>Size</th>
+              </tr>
+              {{FOREACH file;[[rules]]}}
+                <tr>
+                  <td>
+                    <input title="Add File" type="checkbox" name="adfile[]" value="[[file.getVal('file').getId()]]" onChange="assignFile('cmdLine',this.checked,'[[file.getVal('file').getFilename()]]', 'rule');" {{IF [[file.getVal('checked')]] == 1}} checked{{ENDIF}}{{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} disabled{{ENDIF}}>
+                    [[file.getVal('file').getFilename()]]
+                    {{IF [[file.getVal('file').getIsSecret()]] == 1}}
+                      <span class="fas fa-lock" aria-hidden="true"></span>
+                    {{ENDIF}}
+                  </td>
+                  <td>
+                    [[Util::nicenum([[file.getVal('file').getSize()]])]]B
+                  </td>
+                </tr>
+              {{ENDFOREACH}}
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="wordlists">
+        T: Task<br>
+        P: Preprocessor<br>
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <tr>
+                <th>T</th>
+                <th>P</th>
+                <th>Filename</th>
+                <th>Size</th>
+              </tr>
+              {{FOREACH file;[[wordlists]]}}
+              <tr>
+                <td>
+                  <input title="Add File" type="checkbox" name="adfile[]" value="[[file.getVal('file').getId()]]" onChange="assignFile('cmdLine',this.checked,'[[file.getVal('file').getFilename()]]', 'wordlist');" {{IF [[file.getVal('checked')]] == 1 && strpos([[copy.getAttackCmd()]], [[file.getVal('file').getFilename()]]) !== false}} checked{{ENDIF}}{{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} disabled{{ENDIF}}>
+                </td>
+                <td>
+                  <input title="Add File" type="checkbox" name="adfile[]" value="[[file.getVal('file').getId()]]" onChange="assignFile('preprocessorLine',this.checked,'[[file.getVal('file').getFilename()]]', 'wordlist');" {{IF [[file.getVal('checked')]] == 1 && strpos([[copy.getPreprocessorCommand()]], [[file.getVal('file').getFilename()]]) !== false}} checked{{ENDIF}}{{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} disabled{{ENDIF}}>
+                </td>
+                <td>
+                  [[file.getVal('file').getFilename()]]
+                  {{IF [[file.getVal('file').getIsSecret()]] == 1}}
+                    <span class="fas fa-lock" aria-hidden="true"></span>
+                  {{ENDIF}}
+                </td>
+                <td>
+                  [[Util::nicenum([[file.getVal('file').getSize()]])]]B
+                </td>
+              </tr>
+              {{ENDFOREACH}}
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="other">
+        T: Task<br>
+        P: Preprocessor<br>
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <tr>
+                <th>T</th>
+                <th>P</th>
+                <th>Filename</th>
+                <th>Size</th>
+              </tr>
+              {{FOREACH file;[[other]]}}
+              <tr>
+                <td>
+                  <input title="Add File" type="checkbox" name="adfile[]" value="[[file.getVal('file').getId()]]" onChange="assignFile('cmdLine',this.checked,'[[file.getVal('file').getFilename()]]', 'other');" {{IF [[file.getVal('checked')]] == 1 && strpos([[copy.getAttackCmd()]], [[file.getVal('file').getFilename()]]) !== false}} checked{{ENDIF}}{{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} disabled{{ENDIF}}>
+                </td>
+                <td>
+                  <input title="Add File" type="checkbox" name="adfile[]" value="[[file.getVal('file').getId()]]" onChange="assignFile('preprocessorLine',this.checked,'[[file.getVal('file').getFilename()]]', 'other');" {{IF [[file.getVal('checked')]] == 1 && strpos([[copy.getPreprocessorCommand()]], [[file.getVal('file').getFilename()]]) !== false}} checked{{ENDIF}}{{IF ![[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]]}} disabled{{ENDIF}}>
+                </td>
+                <td>
+                  [[file.getVal('file').getFilename()]]
+                  {{IF [[file.getVal('file').getIsSecret()]] == 1}}
+                    <span class="fas fa-lock" aria-hidden="true"></span>
+                  {{ENDIF}}
+                </td>
+                <td>
+                  [[Util::nicenum([[file.getVal('file').getSize()]])]]B
+                </td>
+              </tr>
+              {{ENDFOREACH}}
+            </table>
+          </div>
+        </div>
+      </div>
+      <script type='text/javascript'>
+        toggleFiles('wordlists');
+
+        function toggleFiles(show) {
+          var wordlist = document.getElementById('wordlists');
+          var rule = document.getElementById('rules');
+          var other = document.getElementById('other');
+          if (show === 'rules') {
+            wordlist.style.visibility = "hidden"; // or
+            wordlist.style.display = "none";
+            other.style.visibility = "hidden"; // or
+            other.style.display = "none";
+            rule.style.visibility = "visible"; // or
+            rule.style.display = "inline";
+            document.getElementById("ruleButton").className = "btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}} active";
+            document.getElementById("wordlistButton").className = "btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}}";
+            document.getElementById("otherButton").className = "btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}}";
+          }
+          else if(show === 'wordlists'){
+            wordlist.style.visibility = "visible"; // or
+            wordlist.style.display = "inline";
+            rule.style.visibility = "hidden"; // or
+            rule.style.display = "none";
+            other.style.visibility = "hidden"; // or
+            other.style.display = "none";
+            document.getElementById("ruleButton").className = "btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}}";
+            document.getElementById("wordlistButton").className = "btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}} active";
+            document.getElementById("otherButton").className = "btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}}";
+          }
+          else if (show === 'other') {
+            other.style.visibility = "visible"; // or
+            other.style.display = "inline";
+            rule.style.visibility = "hidden"; // or
+            rule.style.display = "none";
+            wordlist.style.visibility = "hidden"; // or
+            wordlist.style.display = "none";
+            document.getElementById("ruleButton").className = "btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}}";
+            document.getElementById("wordlistButton").className = "btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}}";
+            document.getElementById("otherButton").className = "btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}} active";
+          }
+          return false;
+        }
+
+        function assignFile(cmdLine, addObject, fileName, type) {
+          if (fileName.indexOf('.7z') !== -1) {
+            fileName = fileName.substring(0, fileName.length - 2) + '???';
+          }
+          var cmdObject = document.getElementById(cmdLine);
+          if (addObject === true) {
+            if (cmdObject.value.indexOf(fileName) === -1) {
+              if (cmdObject.value.length > 0 && cmdObject.value.slice(-1) !== ' ') {
+                cmdObject.value += ' ';
+              }
+              if (type === 'rule') {
+                cmdObject.value += '-r ';
+              }
+              cmdObject.value += fileName;
+            }
+          }
+          else {
+            if (type === 'rule') {
+              cmdObject.value = cmdObject.value.replace('-r ' + fileName, '');
+            }
+            cmdObject.value = cmdObject.value.replace(fileName, '');
+            while (cmdObject.value.slice(-1) === ' ') {
+              cmdObject.value = cmdObject.value.substring(0, cmdObject.value.length - 1);
+            }
+            while (cmdObject.value.substring(0, 1) === ' ') {
+              cmdObject.value = cmdObject.value.substring(1);
+            }
+          }
+        }
+      </script>
+    </div>
+  </div>
+</form>
+{%TEMPLATE->struct/foot%}

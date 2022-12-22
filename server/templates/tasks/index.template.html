@@ -1,0 +1,76 @@
+{%TEMPLATE->struct/head%}
+{%TEMPLATE->struct/menu%}
+<h2>{{IF [[showArchived]]}}Archived {{ENDIF}}Tasks ([[sizeof([[taskList]])]])</h2>
+{%TEMPLATE->struct/messages%}
+<div style='overflow: auto;'>
+	{{IF [[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]] && ![[showArchived]]}}
+		<form style ='float: left; padding-right: 5px;' action="tasks.php" class='form-inline' method="POST" onSubmit="if (!confirm('Really delete all finished tasks?')) return false;">
+			<input type='hidden' name='action' value='[[$DTaskAction::DELETE_FINISHED]]'>
+			<input type="hidden" name="csrf" value="[[csrf]]">
+			<input type="submit" value="Delete finished" class='btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}}'>
+		</form>
+	{{ENDIF}}
+  {{IF [[accessControl.hasPermission([[$DAccessControl::CREATE_TASK_ACCESS]])]] && [[showArchived]]}}
+		<form style ='float: left; padding-right: 5px;' action="tasks.php?archived=true" class='form-inline' method="POST" onSubmit="if (!confirm('Really delete all archived tasks?')) return false;">
+			<input type='hidden' name='action' value='[[$DTaskAction::DELETE_ARCHIVED]]'>
+			<input type="hidden" name="csrf" value="[[csrf]]">
+			<input type="submit" value="Delete archived" class='btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}}'>
+		</form>
+	{{ENDIF}}
+  {{IF [[showArchived]]}}
+    <a style="float: left; margin-right: 5px;" href="tasks.php" class="btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}}">Show current</a>
+  {{ELSE}}
+    <a style="float: left; margin-right: 5px;" href="tasks.php?archived=true" class="btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}}">Show archived</a>
+  {{ENDIF}}
+	{%TEMPLATE->tasks/autorefresh%}
+	<br>
+</div>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-bordered table-sm" id="tasks">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Hashlist</th>
+          <th>Dispatched/Searched</th>
+          <th>Cracked</th>
+          <th>Agents</th>
+          <th>Task Priority</th>
+          <th>Max agents</th>
+          <th style="min-width: 170px;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{FOREACH set;[[taskList]]}}
+          {{IF [[set.getVal('taskType')]] == [[$DTaskTypes::NORMAL]]}}
+            {%TEMPLATE->tasks/normal%}
+          {{ELSE}}
+            {%TEMPLATE->tasks/supertask%}
+          {{ENDIF}}
+        {{ENDFOREACH}}
+      </tbody>
+    </table>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $('#tasks').DataTable({
+          pageLength: 50,
+          "order": [ [6, 'desc'], [0, 'asc'] ],
+          "columnDefs": [
+            { "orderable": false, "targets": [3, 8] },
+            { "orderable": true, "targets": [0, 1, 2, 4, 5, 6, 7] }
+          ]
+        });
+      });
+      $(document).ready(function () {
+        $('td[rel=popover]').popover({
+          html: true,
+          trigger: 'hover',
+          container: 'body',
+          content: function () { return '<img style="width: 100%; height: 6px; padding: 0px;" src="' + $(this).data('img') + '">'; }
+        });
+      });
+    </script>
+  </div>
+</div>
+{%TEMPLATE->struct/foot%}

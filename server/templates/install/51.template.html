@@ -1,0 +1,39 @@
+{%TEMPLATE->install/head%}
+<p>
+	<b>DB Connection</b><br>
+	Please fill in the form below for the database connection for BitForces.
+</p>
+{{IF [[failed]]}}
+	<p>
+		<b>Test connection failed, please try again!</b>
+	</p>
+{{ENDIF}}
+<form action='index.php' method='post'>
+	<table border='1'>
+		<tr>
+			<td>Server hostname</td>
+			<td><input type='text' name='server' title="Server"></td>
+		</tr>
+		<tr>
+			<td>Server port</td>
+			<td><input type='text' name='port' value="3306" title="Port"></td>
+		</tr>
+		<tr>
+			<td>MySQL user</td>
+			<td><input type='text' name='user' title="Username"></td>
+		</tr>
+		<tr>
+			<td>MySQL password</td>
+			<td><input type='password' name='pass' title="Password"></td>
+		</tr>
+		<tr>
+			<td>Database name</td>
+			<td><input type='text' name='db' title="Database"></td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><input type='submit' name='check' value='Continue'></td>
+		</tr>
+	</table>
+</form>
+{%TEMPLATE->install/foot%}

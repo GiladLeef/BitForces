@@ -1,0 +1,86 @@
+{%TEMPLATE->struct/head%}
+{%TEMPLATE->struct/menu%}
+<h2>Add new agent</h2>
+{%TEMPLATE->struct/messages%}
+<div class='alert alert-info'>
+	To add new agents provide them with a valid voucher and download a client.<br><br>
+	Used vouchers are automatically deleted to prevent double spending.<br><br>
+	If you are asked to provide the API url on the client to connect to, you need to enter the following:<br>
+	<code>[[apiUrl]]</code>
+</div>
+<h3>Clients</h3>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <tr>
+        <th>ID</th>
+			  <th>Version</th>
+        <th>Type</th>
+        <th>Operating Systems</th>
+        <th>Filename</th>
+        <th>&nbsp;</th>
+      </tr>
+		  {{FOREACH binary;[[agentBinaries]]}}
+        <tr>
+          <td>[[binary.getId()]]</td>
+				  <td>[[binary.getVersion()]]</td>
+          <td>[[binary.getType()]]</td>
+          <td>[[binary.getOperatingSystems()]]</td>
+          <td>[[binary.getFilename()]]</td>
+          <td>
+            <form action="agents.php?new=true" method="POST">
+              <input type="hidden" name="action" value="[[$DAgentAction::DOWNLOAD_AGENT]]">
+              <input type="hidden" name="binary" value="[[binary.getId()]]">
+						  <input type="hidden" name="csrf" value="[[csrf]]">
+              <input type="submit" class='btn btn-primary' value="Download">
+            </form><br>
+					  <code>[[agentUrl]][[binary.getId()]]</code>
+          </td>
+        </tr>
+      {{ENDFOREACH}}
+	  </table>
+  </div>
+</div>
+{{IF [[sizeof([[vouchers]])]] > 0}}
+  <h3>Vouchers</h3>
+	<div class="card">
+    <div class="table-responsive">
+      <table class="table table-bordered">
+			  {{FOREACH voucher;[[vouchers]]}}
+				  <tr>
+					  <td><code>[[voucher.getVoucher()]]</code></td>
+          			  <td>[[date([[config.getVal(DConfig::TIME_FORMAT)]], [[voucher.getTime()]])]]</td>
+          			  <td>
+          				  <form action="agents.php?new=true" method="POST" onSubmit="if (!confirm('Really delete this voucher?')) return false;">
+          					  <input type="hidden" name="action" value="[[$DAgentAction::DELETE_VOUCHER]]">
+          					  <input type="hidden" name="voucher" value="[[voucher.getId()]]">
+										  <input type="hidden" name="csrf" value="[[csrf]]">
+          					  <input type="submit" class='btn btn-danger' value="Delete">
+          				  </form>
+          			  </td>
+          		  </tr>
+			  {{ENDFOREACH}}
+		  </table>
+    </div>
+	</div>
+{{ENDIF}}
+<form action="agents.php?new=true" method="POST">
+	<input type="hidden" name="action" value="[[$DAgentAction::CREATE_VOUCHER]]">
+	<input type="hidden" name="csrf" value="[[csrf]]">
+	<div class="card">
+    <div class="table-responsive">
+      <table class="table table-bordered">
+			  <tr>
+				  <td>New voucher</td>
+				  <td>
+					  <input type="text" class='form-control' name="newvoucher" value="[[Util::randomString(8)]]" title="Voucher Code">
+				  </td>
+				  <td>
+					  <input type="submit" class='btn {{IF [[toggledarkmode]] > 0}}btn-primary{{ELSE}}btn-light{{ENDIF}}' value="Create">
+				  </td>
+			  </tr>
+		  </table>
+    </div>
+	</div>
+</form>
+{%TEMPLATE->struct/foot%}

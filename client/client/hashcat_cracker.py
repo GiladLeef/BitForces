@@ -83,7 +83,7 @@ class HashcatCracker:
         return "1,2,3,4" # new outfile format
 
     def build_command(self, task, chunk):
-        args = " --machine-readable --quiet --status --restore-disable --session=bitforces"
+        args = " --machine-readable --quiet --status --restore-disable --session=BitForces"
         args += " --status-timer " + str(task['statustimer'])
         args += " --outfile-check-timer=" + str(task['statustimer'])
         args += " --outfile-check-dir='" + self.config.get_value('zaps-path') + "/hashlist_" + str(task['hashlistId']) + "'"
@@ -107,7 +107,7 @@ class HashcatCracker:
         # call the command with piping
         pre_args = " --stdout -s " + str(chunk['skip']) + " -l " + str(chunk['length']) + ' '
         pre_args += update_files(task['attackcmd']).replace(task['hashlistAlias'], '')
-        post_args = " --machine-readable --quiet --status --remove --restore-disable --potfile-disable --session=bitforces"
+        post_args = " --machine-readable --quiet --status --remove --restore-disable --potfile-disable --session=BitForces"
         post_args += " --status-timer " + str(task['statustimer'])
         post_args += " --outfile-check-timer=" + str(task['statustimer'])
         post_args += " --outfile-check-dir='" + self.config.get_value('zaps-path') + "/hashlist_" + str(task['hashlistId']) + "'"
@@ -125,7 +125,7 @@ class HashcatCracker:
             binary += "exe"
         pre_args = " -s " + str(chunk['skip']) + " -l " + str(chunk['length']) + ' '
         pre_args += get_wordlist(update_files(task['attackcmd']).replace(task['hashlistAlias'], ''))
-        post_args = " --machine-readable --quiet --status --remove --restore-disable --potfile-disable --session=bitforces"
+        post_args = " --machine-readable --quiet --status --remove --restore-disable --potfile-disable --session=BitForces"
         post_args += " --status-timer " + str(task['statustimer'])
         post_args += " --outfile-check-timer=" + str(task['statustimer'])
         post_args += " --outfile-check-dir=../../hashlist_" + str(task['hashlistId'])
@@ -155,7 +155,7 @@ class HashcatCracker:
         if preprocessor['skipCommand'] is None or preprocessor['limitCommand'] is None:
             pre_args += " | head -n " + str(chunk['skip'] + chunk['length']) + " | tail -n " + str(chunk['length'])
 
-        post_args = " --machine-readable --quiet --status --remove --restore-disable --potfile-disable --session=bitforces"
+        post_args = " --machine-readable --quiet --status --remove --restore-disable --potfile-disable --session=BitForces"
         post_args += " --status-timer " + str(task['statustimer'])
         post_args += " --outfile-check-timer=" + str(task['statustimer'])
         post_args += " --outfile-check-dir='" + self.config.get_value('zaps-path') + "hashlist_" + str(task['hashlistId']) + "'"
@@ -475,7 +475,7 @@ class HashcatCracker:
             return self.run_speed_benchmark(task)
 
         args = " --machine-readable --quiet --runtime=" + str(task['bench'])
-        args += " --restore-disable --potfile-disable --session=bitforces -p \"" + str(chr(9)) + "\" "
+        args += " --restore-disable --potfile-disable --session=BitForces -p \"" + str(chr(9)) + "\" "
         args += update_files(task['attackcmd']).replace(task['hashlistAlias'], "'" + self.config.get_value('hashlists-path') + "/" + str(task['hashlistId']) + "' ") + task['cmdpars']
         args += " -o '" + self.config.get_value('hashlists-path') + "/" + str(task['hashlistId']) + ".out'"
         full_cmd = f"'{self.callPath}'" + args
@@ -524,7 +524,7 @@ class HashcatCracker:
 
     def run_speed_benchmark(self, task):
         args = " --machine-readable --quiet --progress-only"
-        args += " --restore-disable --potfile-disable --session=bitforces -p \"" + str(chr(9)) + "\" "
+        args += " --restore-disable --potfile-disable --session=BitForces -p \"" + str(chr(9)) + "\" "
         if 'usePrince' in task and task['usePrince']:
             args += get_rules_and_hl(update_files(task['attackcmd']), task['hashlistAlias']).replace(task['hashlistAlias'], "'" + self.config.get_value('hashlists-path') + "/" + str(task['hashlistId']) + "' ")
             args += " example.dict" + ' ' + task['cmdpars']

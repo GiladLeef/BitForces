@@ -141,15 +141,15 @@ def init(args):
     if args.preprocessors_path and len(args.preprocessors_path):
         CONFIG.set_value('preprocessors-path', os.path.abspath(args.preprocessors_path))
 
-    logging.info("Starting client '" + Initialize.get_version() + "'...")
+    logging.info("Starting BitForces client version 1.0.0")
 
     # check if there are running hashcat.pid files around (as we assume that nothing is running anymore if the client gets newly started)
     if os.path.exists(CONFIG.get_value('crackers-path')):
         for root, dirs, files in os.walk(CONFIG.get_value('crackers-path')):
             for folder in dirs:
-                if folder.isdigit() and os.path.exists(CONFIG.get_value('crackers-path') + "/" + folder + "/bitforces.pid"):
+                if folder.isdigit() and os.path.exists(CONFIG.get_value('crackers-path') + "/" + folder + "/BitForces.pid"):
                     logging.info("Cleaning hashcat PID file from " + CONFIG.get_value('crackers-path') + "/" + folder)
-                    os.unlink(CONFIG.get_value('crackers-path') + "/" + folder + "/bitforces.pid")
+                    os.unlink(CONFIG.get_value('crackers-path') + "/" + folder + "/BitForces.pid")
 
     session = Session(requests.Session()).s
     session.headers.update({'User-Agent': Initialize.get_version()})
@@ -319,15 +319,15 @@ def de_register():
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='bitforces Client v' + Initialize.get_version_number(), prog='python3 bitforces.zip')
+    parser = argparse.ArgumentParser(description='BitForces Client v' + Initialize.get_version_number(), prog='BitForces.exe')
     parser.add_argument('--de-register', action='store_true', help='client should automatically de-register from server now')
     parser.add_argument('--version', action='store_true', help='show version information')
     parser.add_argument('--number-only', action='store_true', help='when using --version show only the number')
     parser.add_argument('--disable-update', action='store_true', help='disable retrieving auto-updates of the client from the server')
     parser.add_argument('--debug', '-d', action='store_true', help='enforce debugging output')
     parser.add_argument('--voucher', type=str, required=False, help='voucher to use to automatically register')
-    parser.add_argument('--url', type=str, required=False, help='URL to bitforces client API')
-    parser.add_argument('--cert', type=str, required=False, help='Client TLS cert bundle for bitforces client API')
+    parser.add_argument('--url', type=str, required=False, help='URL to BitForces client API')
+    parser.add_argument('--cert', type=str, required=False, help='Client TLS cert bundle for BitForces client API')
     parser.add_argument('--files-path', type=str, required=False, help='Use given folder path as files location')
     parser.add_argument('--crackers-path', type=str, required=False, help='Use given folder path as crackers location')
     parser.add_argument('--hashlists-path', type=str, required=False, help='Use given folder path as hashlists location')
@@ -353,7 +353,7 @@ if __name__ == "__main__":
     try:
         init_logging(args)
 
-        # check if there is a lock file and check if this pid is still running bitforces
+        # check if there is a lock file and check if this pid is still running BitForces
         if os.path.exists("lock.pid") and os.path.isfile("lock.pid"):
             pid = file_get_contents("lock.pid")
             logging.info("Found existing lock.pid, checking if python process is running...")
@@ -362,10 +362,10 @@ if __name__ == "__main__":
                     command = psutil.Process(int(pid)).cmdline()[0].replace('\\', '/').split('/')
                     print(command)
                     if str.startswith(command[-1], "python"):
-                        logging.fatal("There is already a bitforces agent running in this directory!")
+                        logging.fatal("There is already a BitForces agent running in this directory!")
                         sys.exit(-1)
                 except Exception:
-                    # if we fail to determine the cmd line we assume that it's either not running anymore or another process (non-bitforces)
+                    # if we fail to determine the cmd line we assume that it's either not running anymore or another process (non-BitForces)
                     pass
             logging.info("Ignoring lock.pid file because PID is not existent anymore or not running python!")
 

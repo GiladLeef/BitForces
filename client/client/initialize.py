@@ -12,7 +12,7 @@ class Initialize:
 
     @staticmethod
     def get_version():
-        return "Python" + Initialize.get_version_number()
+        return "BitForces-" + Initialize.get_version_number()
 
     @staticmethod
     def get_version_number():
@@ -56,7 +56,7 @@ class Initialize:
         else:
             logging.info("Login successful!")
             if 'server-version' in ans:
-                logging.info("bitforces Server version: " + ans['server-version'])
+                logging.info("BitForces Server version: " + ans['server-version'])
             if 'multicastEnabled' in ans and ans['multicastEnabled'] and self.get_os() == 0:  # currently only allow linux
                 logging.info("Multicast enabled!")
                 self.config.set_value('multicast', True)
@@ -190,7 +190,7 @@ class Initialize:
         if not self.config.get_value('url'):
             # ask for url
             if args.url is None:
-                url = input("Please enter the url to the API of your bitforces installation:\n").strip()
+                url = input("Please enter the URL to the API of the current BitForces server installation:\n").strip()
             else:
                 url = args.url
             logging.debug("Setting url to: " + url)

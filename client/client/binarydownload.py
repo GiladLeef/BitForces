@@ -52,12 +52,12 @@ class BinaryDownload:
                     if os.path.isfile("update.zip") and os.path.getsize("update.zip"):
                         if os.path.isfile("old.zip"):
                             os.unlink("old.zip")
-                        os.rename("BitForces.zip", "old.zip")
-                        os.rename("update.zip", "BitForces.zip")
+                        os.rename("bitforces.zip", "old.zip")
+                        os.rename("update.zip", "bitforces.zip")
                         logging.info("Update received, restarting client...")
                         if os.path.exists("lock.pid"):
                             os.unlink("lock.pid")
-                        os.execl(sys.executable, sys.executable, "BitForces.zip")
+                        os.execl(sys.executable, sys.executable, "bitforces.zip")
                         exit(0)
 
     def __check_utils(self):

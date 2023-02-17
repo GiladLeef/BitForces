@@ -4,7 +4,7 @@ We use Hashcat over the network. Sharing the cracked wallets profits equally.
 
 * If anyone got good wallets, DM me at https://t.me/GiladLeef
 
-* BitForces Telegram group - https://t.me/BitForcers
+* BitForces Telegram group - https://t.me/BitForces
 
 # How to get started?
 * You need to have a GPU Device
